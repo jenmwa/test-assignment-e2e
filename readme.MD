@@ -12,3 +12,59 @@ Ni skall skapa e2e-tester för applikationen som ni har fått given.
 
 För G krävs det att ni har skrivit tester som går igenom "happy flow" av data och använder data från api:t.
 För VG krävs det att ni även testar vad som händer om ni inte får den data som ni förväntar er och även använder mockad data
+
+## e2e testning
+
+installera cypress:
+```bash
+npm install cypress -—save-dev
+```
+
+starta cypress:
+```bash
+npx cypress open
+```
+starta upp projekt (följ webbläsaren)
+SE TILL ATT PARCEL ÄR IGÅNG!**
+```bash
+npx parcel src/index.html --no-cache
+```
+
+Öppna en ny terminal : 
+	npx cypress open
+
+Ny flik/browser?<br>
+E2e-tester + komponenttester välj e2e-testing<br>
+Välj continue<br>
+Välj webbläsare<br>
+
+skapa fil i cypress-mapen:
+tsconfig.json
+
+i denna:
+```bash
+{
+    "include": ["**/*.ts"],
+    "exclude": [],
+    "compilerOptions": {
+        "target": "ESNext",
+        "lib": ["ESNext", "dom"],
+        "types": ["cypress", "node"]
+    }
+}
+```
+
+
+cypress/tsconfig.json:
+
+```bash
+{
+  "include": ["**/*.ts"],
+  "exclude": [],
+  "compilerOptions": {
+      "target": "ESNext",
+      "lib": ["ESNext", "dom"],
+      "types": ["cypress", "node"]
+  },
+}
+```

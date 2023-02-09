@@ -29,10 +29,10 @@ describe('start elements exist', () => {
   })
 });
 
-describe('should test submitBtn', () => {
+describe('tests of submitBtn', () => {
 
   it('should trigger clickevent submitBtn',() => {
-    cy.get('#search').click()
+    cy.get('button').click();
     });
   
   it('should have an text on Btn', () => {
@@ -49,76 +49,104 @@ describe('should test submitBtn', () => {
     });
 });
 
-describe('should test API data', () => {
-  // API happy flow
-describe('tests of input', () => {
+describe('tests of API data', () => {
+    // API happy flow
+  describe('tests of input', () => {
 
-  it('should have text in it', () => {
-    cy.get('input#searchText').type('Almost Famous').should('have.value','Almost Famous');
+    it('should have text in it', () => {
+      cy.get('input#searchText').type('Almost Famous').should('have.value','Almost Famous');
+    });
+
+    it('should get data with correct searchText', () => {
+      cy.get('#searchText').type('Almost Famous');
+      cy.get('form#searchForm').submit();
+      cy.get('#movie-container').should('contain', 'Almost Famous');
+    })
+
+    it('should render 10 movies when search ', () => {
+      cy.get('input#searchText').type('Almost Famous').should('have.value', 'Almost Famous');
+      cy.get('form#searchForm').submit();
+      cy.get('div.movie').should('have.length', 10);
+    });
+
+    it('should render movies if typed & clicked', () => {
+      cy.get('input#searchText').type('Almost Famous').should('have.value', 'Almost Famous');
+      cy.get('form#searchForm').submit();
+      cy.get('h3').contains('Almost Famous');
+    });
+
+    it('should render Html-elements', () => {
+      cy.get('input#searchText').type('Almost Famous').should('have.value', 'Almost Famous');
+      cy.get('form#searchForm').submit();
+      cy.get('div.movie').should('exist');
+      cy.get('div.movie h3').should('exist');
+      cy.get('div.movie img').should('exist');
+      cy.get(':nth-child(1) > h3').should('contain', 'Almost Famous');
+    });
+
+});
+
+  // ERROR
+  describe('should test empty search and incorrect search', () => {
+    it('should display error if empty search', () => {
+      cy.get('#searchText').type(' ');
+      cy.get('form#searchForm').submit();
+      cy.get('#movie-container').should('exist');
+      cy.get('p').should('exist').should('contain', 'Inga sökresultat att visa');
+    });
+
+    it('should not get data with incorrect searchText', () => {
+      cy.get('#searchText').type(' Al');
+      cy.get('form#searchForm').submit();
+      cy.get('#movie-container').should('not.contain', 'Almost Famous');
+      cy.get('p').should('exist').should('contain', 'Inga sökresultat att visa');
+    });
+
   });
 
-  it('should get data with correct searchText', () => {
-    cy.get('#searchText').type('Almost Famous');
-    cy.get('form#searchForm').submit();
-    cy.get('#movie-container').should('contain', 'Almost Famous');
-  })
+});
 
-  it('should render 10 movies when search ', () => {
-    cy.get('input#searchText').type('Almost Famous').should('have.value', 'Almost Famous');
-    cy.get('form#searchForm').submit();
-    cy.get('div.movie').should('have.length', 10);
-  });
-
-  it('should render movies if typed & clicked', () => {
-    cy.get('input#searchText').type('Almost Famous').should('have.value', 'Almost Famous');
-    cy.get('form#searchForm').submit();
-    cy.get('h3').contains('Almost Famous');
-  });
-
-  it('should render Html-elements', () => {
-    cy.get('input#searchText').type('Almost Famous').should('have.value', 'Almost Famous');
+describe('should test MOCK data', () => {
+  it('should get correct html through mockdata', () => {
+    cy.intercept('GET', "http://omdbapi.com/*", {fixture: "omdbResponse"}).as("omdbCall");
+    cy.get('#searchText').type('Casablanca');
     cy.get('form#searchForm').submit();
     cy.get('div.movie').should('exist');
     cy.get('div.movie h3').should('exist');
     cy.get('div.movie img').should('exist');
-    cy.get(':nth-child(1) > h3').should('contain', 'Almost Famous');
+  
   });
 
-});
-
-// ERROR
-describe('should test empty search and incorrect search', () => {
-  it('should display error if empty search', () => {
-    cy.get('#searchText').type(' ');
-    cy.get('form#searchForm').submit();
-    cy.get('#movie-container').should('exist');
-    cy.get('p').should('exist').should('contain', 'Inga sökresultat att visa');
-  });
-
-  it('should not get data with incorrect searchText', () => {
-    cy.get('#searchText').type(' Al');
-    cy.get('form#searchForm').submit();
-    cy.get('#movie-container').should('not.contain', 'Almost Famous');
-    cy.get('p').should('exist').should('contain', 'Inga sökresultat att visa');
-  });
-
-});
-
-})
-
-describe('should test MOCK data', () => {
   it('should get mockdata with correct url', () => {
-    cy.intercept('GET', "http://omdbapi.com/?apikey=5eed9320&s=*", {fixture: "omdbResponse"}).as("omdbCall");
+    cy.intercept('GET', "http://omdbapi.com/*", {fixture: "omdbResponse"}).as("omdbCall");
     cy.get('#searchText').type('Casablanca');
     cy.get('form#searchForm').submit();
-    cy.wait('@omdbCall').its('request.url').should('contain', 'Casablanca'); //mellanslag blir %20, cypress searchresponse = 'http://omdbapi.com/?apikey=416ed51a&s=Almost%20Famous'
-    cy.get('#movie-container').should('contain', 'Casablanca');
+    cy.wait('@omdbCall').its('request.url').should('contain', '=Casablanca'); //mellanslag blir %20, cypress searchresponse = 'http://omdbapi.com/?apikey=416ed51a&s=Almost%20Famous'
+    cy.get('div.movie').should('have.length', 3);
+    cy.get(':nth-child(1) > h3').should('contain', 'Almost Famous');
+    cy.get(':nth-child(2) > h3').should('contain', 'Casablanca');
+    cy.get(':nth-child(3) > h3').should('contain', 'The Crow');
   
   });
-  
-  // it('should not get mockdata with incorrect url', () => {
-  
-  // });
 
 })
-//MOCK
+
+describe('should test MOCK data empty & incorrect search', () => {
+  //MOCK empty list
+  it('should get error with empty search mockdata', () => {
+    cy.intercept('GET', "http://omdbapi.com/*", {fixture: "emptyResponse"}).as("emptyCall");
+    cy.get('#searchText').type(' ');
+    cy.get('form#searchForm').submit();
+    cy.get('p').should('exist').should('contain', 'Inga sökresultat att visa');
+
+  });
+
+  it('should not get data but error with incorrect searchText', () => {
+    cy.intercept('GET', "http://omdbapi.com/*", {fixture: "emptyResponse"}).as("emptyCall");
+    cy.get('#searchText').type('Rebel without a cause');
+    cy.get('form#searchForm').submit();
+    cy.get("#movie-container").find(".movie").should("have.length", 0);
+    cy.get('#movie-container').should('not.contain', 'Rebel without a cause');
+    cy.get('p').should('exist').should('contain', 'Inga sökresultat att visa');
+  });
+});
