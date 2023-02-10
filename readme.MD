@@ -41,19 +41,6 @@ Välj webbläsare<br>
 skapa fil i cypress-mapen:
 tsconfig.json
 
-i denna:
-```bash
-{
-    "include": ["**/*.ts"],
-    "exclude": [],
-    "compilerOptions": {
-        "target": "ESNext",
-        "lib": ["ESNext", "dom"],
-        "types": ["cypress", "node"]
-    }
-}
-```
-
 
 cypress/tsconfig.json:
 
